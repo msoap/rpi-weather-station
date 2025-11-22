@@ -13,3 +13,7 @@ RPI a simple weather station
 ```sh
 make build-rpi
 ```
+
+## Reallife screenshot
+
+![scr](https://github.com/user-attachments/assets/e1cad8f1-8bcc-4b48-887e-5ea758caa637)
