@@ -64,8 +64,8 @@ func (sc *Screen) Rectangle(x, y, w, h int, on bool) {
 }
 
 func (sc *Screen) Box(x, y, w, h int, on bool) {
-	for i := 0; i < w; i++ {
-		for j := 0; j < h; j++ {
+	for i := range w {
+		for j := range h {
 			sc.SetPixel(x+i, y+j, on)
 		}
 	}

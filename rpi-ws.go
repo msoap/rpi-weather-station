@@ -34,7 +34,6 @@ func main() {
 	}
 
 	for range time.Tick(time.Second * 10) {
-
 		temp, pres, err := bme.Read()
 		if err != nil {
 			log.Fatalf("Failed to read BME280: %v", err)
