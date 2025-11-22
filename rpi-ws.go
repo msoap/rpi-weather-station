@@ -44,8 +44,8 @@ func main() {
 		log.Printf("Temperature: %s, Pressure: %s", temp, pres)
 
 		scr.Box(1, 5, 120, 55, false) // Clear area
-		DrawText(&scr, 10, 10, "Temp: "+temp)
-		DrawText(&scr, 10, 30, "Pres: "+pres)
+		scr.DrawText(10, 10, "Temp: "+temp)
+		scr.DrawText(10, 30, "Pres: "+pres)
 
 		disp.Update()
 	}
