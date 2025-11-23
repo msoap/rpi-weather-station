@@ -34,9 +34,11 @@ func (sc *Screen) DrawText(x, y int, text string) int {
 	for py := 0; py < height; py++ {
 		for px := 0; px < width; px++ {
 			_, _, _, a := img.At(px, py).RGBA()
+			color := 0
 			if a > 0 {
-				sc.SetPixel(x+px, y+py, true)
+				color = 1
 			}
+			sc.Buffer.Set(x+px, y+py, color)
 		}
 	}
 

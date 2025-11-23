@@ -18,10 +18,11 @@ const (
 
 // SH1106 driver
 type SH1106 struct {
-	spi   spi.Conn
-	dc    gpio.PinOut
-	reset gpio.PinOut
-	buf   [dispW * dispH / 8]byte
+	spi     spi.Conn
+	dc      gpio.PinOut
+	reset   gpio.PinOut
+	spiPort spi.PortCloser
+	buf     [dispW * dispH / 8]byte
 }
 
 // Create new SH1106 driver
@@ -31,7 +32,6 @@ func NewSH1106() (*SH1106, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to open SPI: %w", err)
 	}
-	// defer spiPort.Close() // TODO: manage closing elsewhere
 
 	spiDev, err := spiPort.Connect(8*physic.MegaHertz, spi.Mode0, 8)
 	if err != nil {
@@ -49,9 +49,10 @@ func NewSH1106() (*SH1106, error) {
 	}
 
 	return &SH1106{
-		spi:   spiDev,
-		dc:    dc,
-		reset: reset,
+		spi:     spiDev,
+		dc:      dc,
+		reset:   reset,
+		spiPort: spiPort,
 	}, nil
 }
 
@@ -148,4 +149,10 @@ func (d *SH1106) Update() {
 
 func (d *SH1106) Size() (width, height int) {
 	return dispW, dispH
+}
+
+func (d *SH1106) Finish() {
+	d.Clear()
+	d.Update()
+	d.spiPort.Close()
 }
