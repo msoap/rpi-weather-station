@@ -10,7 +10,11 @@ type termScreen struct {
 }
 
 func NewTermScreen() (*termScreen, chan struct{}, error) {
-	tcgObj, err := tcg.New(tcg.Mode2x3)
+	tcgObj, err := tcg.New(tcg.Mode2x3,
+		tcg.WithClipCenter(dispW/2, dispH/3+1),
+		tcg.WithColor("blue"),
+		tcg.WithBackgroundColor("black"),
+	)
 	if err != nil {
 		return nil, nil, err
 	}
