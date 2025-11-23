@@ -27,8 +27,9 @@ func main() {
 	flag.Parse()
 
 	var (
-		disp dispDrawler
-		err  error
+		disp   dispDrawler
+		err    error
+		exitCh chan struct{}
 	)
 	if *useTermScreen {
 		logFile, err := os.OpenFile("term.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
@@ -37,7 +38,7 @@ func main() {
 		}
 		log.SetOutput(logFile)
 
-		disp, err = NewTermScreen()
+		disp, exitCh, err = NewTermScreen()
 		if err != nil {
 			log.Fatalf("Failed to initialize terminal screen: %v", err)
 		}
@@ -63,7 +64,6 @@ func main() {
 	scr.Rect(0, 0, width, height, 1)
 	scr.HLine(0, 2, width, 1)
 	scr.HLine(0, 4, width, 1)
-	scr.Update()
 
 	var bme BME280Reader
 	if *useFakeBME {
@@ -110,7 +110,8 @@ MAINLOOP:
 
 		select {
 		case <-sigChan:
-			log.Println("Exiting...")
+			break MAINLOOP
+		case <-exitCh:
 			break MAINLOOP
 		case <-time.Tick(*updateDelay):
 		}

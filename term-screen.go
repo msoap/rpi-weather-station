@@ -1,8 +1,6 @@
 package main
 
 import (
-	"os"
-
 	"github.com/gdamore/tcell/v2"
 	"github.com/msoap/tcg"
 )
@@ -11,19 +9,20 @@ type termScreen struct {
 	tcg *tcg.Tcg
 }
 
-func NewTermScreen() (*termScreen, error) {
+func NewTermScreen() (*termScreen, chan struct{}, error) {
 	tcgObj, err := tcg.New(tcg.Mode2x3)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
+	exitCh := make(chan struct{})
 	go func() {
 		for {
 			switch ev := tcgObj.TCellScreen.PollEvent().(type) {
 			case *tcell.EventKey:
 				if ev.Key() == tcell.KeyEscape || ev.Key() == tcell.KeyCtrlC || ev.Rune() == 'q' {
-					tcgObj.Finish()
-					os.Exit(0)
+					close(exitCh)
+					return
 				}
 			}
 		}
@@ -31,7 +30,7 @@ func NewTermScreen() (*termScreen, error) {
 
 	return &termScreen{
 		tcg: tcgObj,
-	}, nil
+	}, exitCh, nil
 }
 
 func (ts *termScreen) Clear() {
