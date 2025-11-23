@@ -2,10 +2,17 @@ package main
 
 import (
 	"log"
+	"os"
+	"os/signal"
 	"strings"
+	"syscall"
 	"time"
 
 	"periph.io/x/host/v3"
+)
+
+const (
+	updateDelay = time.Second * 10
 )
 
 func main() {
@@ -33,8 +40,12 @@ func main() {
 		log.Fatalf("Failed to initialize BME280: %v", err)
 	}
 
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)
+	<-sigChan
+
 	shiftX, shiftY, i := 0, 0, 0 // for shift printed text to avoid burn-in oled screen
-	for range time.Tick(time.Second * 10) {
+	for {
 		switch i % 4 {
 		case 0:
 			shiftX, shiftY = 0, 0
@@ -60,7 +71,12 @@ func main() {
 
 		disp.Update()
 		i++
-	}
 
-	log.Println("OLED initialized, test pixels drawn.")
+		select {
+		case <-sigChan:
+			log.Println("Exiting...")
+			return
+		case <-time.Tick(updateDelay):
+		}
+	}
 }
