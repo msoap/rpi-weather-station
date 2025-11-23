@@ -1,5 +1,10 @@
 package main
 
+import (
+	"github.com/quasilyte/bitsweetfont"
+	"golang.org/x/image/font"
+)
+
 type DispDrawler interface {
 	Clear()
 	Update()
@@ -11,14 +16,16 @@ type DispDrawler interface {
 type Screen struct {
 	width, height int
 	disp          DispDrawler
+	fontFace      font.Face
 }
 
 func NewScreen(disp DispDrawler) Screen {
 	width, height := disp.Size()
 	return Screen{
-		width:  width,
-		height: height,
-		disp:   disp,
+		width:    width,
+		height:   height,
+		disp:     disp,
+		fontFace: bitsweetfont.New1(),
 	}
 }
 
